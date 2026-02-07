@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import { mockEntries, weatherMap } from "@/lib/mockData";
 import { WeatherState } from "@/lib/types";
@@ -67,7 +68,17 @@ export default function TimelinePage() {
                     className="w-full rounded-lg bg-gradient-to-t from-indigo/30 to-violet/20 transition-all"
                     style={{ height: `${Math.max(height, 4)}px` }}
                   />
-                  <span className="text-lg">{weather.emoji}</span>
+                  {weather.asset ? (
+                    <Image
+                      src={weather.asset}
+                      alt={weather.label}
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                    />
+                  ) : (
+                    <span className="text-lg">{weather.emoji}</span>
+                  )}
                   <span className="text-[10px] text-muted">{count}</span>
                 </button>
               );
@@ -78,9 +89,24 @@ export default function TimelinePage() {
         {/* Filter Label */}
         {filter !== "all" && (
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-sm text-muted">
-              Showing: {weatherMap[filter].emoji} {weatherMap[filter].label}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted">Showing:</span>
+              {(() => {
+                const filterWeather = weatherMap[filter];
+                return filterWeather.asset ? (
+                  <Image
+                    src={filterWeather.asset}
+                    alt={filterWeather.label}
+                    width={20}
+                    height={20}
+                    className="h-5 w-5"
+                  />
+                ) : (
+                  <span className="text-sm">{filterWeather.emoji}</span>
+                );
+              })()}
+              <span className="text-sm text-muted">{weatherMap[filter].label}</span>
+            </div>
             <button
               onClick={() => setFilter("all")}
               className="rounded-full bg-card-border/50 px-2 py-0.5 text-xs text-muted hover:text-foreground"
@@ -117,12 +143,33 @@ export default function TimelinePage() {
               >
                 <div className="mb-2 flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{weather.emoji}</span>
+                    {weather.asset ? (
+                      <Image
+                        src={weather.asset}
+                        alt={weather.label}
+                        width={32}
+                        height={32}
+                        className="h-8 w-8"
+                      />
+                    ) : (
+                      <span className="text-2xl">{weather.emoji}</span>
+                    )}
                     <div>
                       <p className="text-sm font-medium">{weather.label}</p>
                       {secondary && (
-                        <p className="text-xs text-muted">
-                          + {secondary.emoji} {secondary.label}
+                        <p className="text-xs text-muted flex items-center gap-1">
+                          +{" "}
+                          {secondary.asset ? (
+                            <Image
+                              src={secondary.asset}
+                              alt={secondary.label}
+                              width={16}
+                              height={16}
+                              className="h-4 w-4"
+                            />
+                          ) : (
+                            secondary.emoji
+                          )} {secondary.label}
                         </p>
                       )}
                     </div>

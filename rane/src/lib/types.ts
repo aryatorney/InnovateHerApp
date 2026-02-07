@@ -9,6 +9,7 @@ export interface WeatherInfo {
   id: WeatherState;
   label: string;
   emoji: string;
+  asset?: string;
   description: string;
   color: string;
   bgGradient: string;

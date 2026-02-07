@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { WeatherState } from "@/lib/types";
 import { weatherMap } from "@/lib/mockData";
 
@@ -23,11 +24,32 @@ export default function WeatherCard({
         className={`rounded-2xl border border-card-border bg-gradient-to-br ${weather.bgGradient} p-4`}
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{weather.emoji}</span>
+          {weather.asset ? (
+            <Image
+              src={weather.asset}
+              alt={weather.label}
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
+          ) : (
+            <span className="text-2xl">{weather.emoji}</span>
+          )}
           <span className="font-medium">{weather.label}</span>
           {secondaryWeather && (
             <span className="text-sm text-muted">
-              + {secondaryWeather.emoji} {secondaryWeather.label}
+              +{" "}
+              {secondaryWeather.asset ? (
+                <Image
+                  src={secondaryWeather.asset}
+                  alt={secondaryWeather.label}
+                  width={16}
+                  height={16}
+                  className="inline h-4 w-4"
+                />
+              ) : (
+                secondaryWeather.emoji
+              )} {secondaryWeather.label}
             </span>
           )}
         </div>
@@ -39,8 +61,18 @@ export default function WeatherCard({
     <div
       className={`rounded-3xl border border-card-border bg-gradient-to-br ${weather.bgGradient} p-6`}
     >
-      <div className="mb-4 text-center">
-        <span className="text-5xl">{weather.emoji}</span>
+      <div className="mb-4 flex justify-center">
+        {weather.asset ? (
+          <Image
+            src={weather.asset}
+            alt={weather.label}
+            width={120}
+            height={120}
+            className="h-30 w-30"
+          />
+        ) : (
+          <span className="text-5xl">{weather.emoji}</span>
+        )}
       </div>
       <h2 className="mb-1 text-center text-xl font-semibold">
         {weather.label}
@@ -50,7 +82,17 @@ export default function WeatherCard({
       </p>
       {secondaryWeather && (
         <div className="mb-4 flex items-center justify-center gap-2 text-sm text-muted">
-          <span>{secondaryWeather.emoji}</span>
+          {secondaryWeather.asset ? (
+            <Image
+              src={secondaryWeather.asset}
+              alt={secondaryWeather.label}
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+          ) : (
+            <span>{secondaryWeather.emoji}</span>
+          )}
           <span>with hints of {secondaryWeather.label}</span>
         </div>
       )}
