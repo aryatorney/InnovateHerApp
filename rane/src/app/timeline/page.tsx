@@ -1,19 +1,29 @@
 "use client";
 
 import { useState } from "react";
-<<<<<<< HEAD
 import Link from "next/link";
 import Image from "next/image";
-=======
->>>>>>> 8ec7b59 (feat: Introduce Productivity Curve component, remove home page, and update shelter suggestions.)
 import Navigation from "@/components/Navigation";
 import WeatherCalendar from "@/components/WeatherCalendar";
-import { mockEntries } from "@/lib/mockData";
+import { mockEntries, weatherMap } from "@/lib/mockData";
 
 export default function TimelinePage() {
   const now = new Date();
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [filter, setFilter] = useState("all");
+
+  const allWeatherTypes = Object.keys(weatherMap);
+
+  const weatherCounts = mockEntries.reduce((acc, entry) => {
+    acc[entry.primaryWeather] = (acc[entry.primaryWeather] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const filtered = mockEntries.filter(
+    (entry) => filter === "all" || entry.primaryWeather === filter
+  );
+
 
   return (
     <div className="min-h-screen pb-24">
@@ -26,7 +36,7 @@ export default function TimelinePage() {
       </header>
 
       <main className="mx-auto max-w-lg px-6 pt-4">
-<<<<<<< HEAD
+
         {/* Weather Distribution */}
         <div className="mb-6 rounded-2xl border border-card-border bg-card p-5">
           <h3 className="mb-3 text-sm font-semibold tracking-wide text-muted uppercase">
@@ -44,11 +54,10 @@ export default function TimelinePage() {
                   onClick={() =>
                     setFilter(filter === type ? "all" : type)
                   }
-                  className={`flex flex-1 flex-col items-center gap-1 rounded-xl p-2 transition-all ${
-                    filter === type
-                      ? "bg-indigo/10 ring-1 ring-indigo/30"
-                      : "hover:bg-background"
-                  }`}
+                  className={`flex flex-1 flex-col items-center gap-1 rounded-xl p-2 transition-all ${filter === type
+                    ? "bg-indigo/10 ring-1 ring-indigo/30"
+                    : "hover:bg-background"
+                    }`}
                 >
                   <div
                     className="w-full rounded-lg bg-gradient-to-t from-indigo/30 to-violet/20 transition-all"
@@ -102,7 +111,7 @@ export default function TimelinePage() {
           </div>
         )}
 
-=======
+
         {/* Weather Calendar */}
         <div className="mb-6">
           <WeatherCalendar
@@ -116,7 +125,6 @@ export default function TimelinePage() {
           />
         </div>
 
->>>>>>> 8ec7b59 (feat: Introduce Productivity Curve component, remove home page, and update shelter suggestions.)
         {/* Pattern Insight */}
         <div className="rounded-2xl bg-gradient-to-br from-indigo/8 to-violet/8 p-4">
           <p className="text-sm leading-relaxed text-foreground/70">
@@ -126,7 +134,6 @@ export default function TimelinePage() {
             during late cycle phases.
           </p>
         </div>
-<<<<<<< HEAD
 
         {/* Entries */}
         <div className="space-y-3">
@@ -214,8 +221,6 @@ export default function TimelinePage() {
             </p>
           </div>
         )}
-=======
->>>>>>> 8ec7b59 (feat: Introduce Productivity Curve component, remove home page, and update shelter suggestions.)
       </main>
 
       <Navigation />
