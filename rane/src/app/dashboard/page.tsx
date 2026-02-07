@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import Navigation from "@/components/Navigation";
 import WeatherCard from "@/components/WeatherCard";
 import ReflectionInput from "@/components/ReflectionInput";
@@ -51,9 +52,22 @@ export default function DashboardPage() {
             href="/today"
             className="rounded-2xl border border-card-border bg-card p-4 transition-all hover:shadow-md"
           >
-            <span className="mb-1 block text-lg">
-              {weatherMap[todayEntry.primaryWeather].emoji}
-            </span>
+            <div className="mb-1 block h-6 w-6">
+              {(() => {
+                const todayWeather = weatherMap[todayEntry.primaryWeather];
+                return todayWeather.asset ? (
+                  <Image
+                    src={todayWeather.asset}
+                    alt={todayWeather.label}
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
+                ) : (
+                  <span className="text-lg">{todayWeather.emoji}</span>
+                );
+              })()}
+            </div>
             <span className="text-sm font-medium">View Today</span>
             <p className="mt-0.5 text-xs text-muted">Full weather report</p>
           </Link>
@@ -87,7 +101,17 @@ export default function DashboardPage() {
                   href={`/day/${entry.date}`}
                   className="flex items-center gap-4 rounded-2xl border border-card-border bg-card p-4 transition-all hover:shadow-md"
                 >
-                  <span className="text-2xl">{weather.emoji}</span>
+                  {weather.asset ? (
+                    <Image
+                      src={weather.asset}
+                      alt={weather.label}
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 shrink-0"
+                    />
+                  ) : (
+                    <span className="text-2xl">{weather.emoji}</span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{weather.label}</p>
                     <p className="truncate text-xs text-muted">
