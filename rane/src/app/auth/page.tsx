@@ -12,6 +12,20 @@ export default function AuthPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Before navigating, ask whether the user wants to connect health data
+    setShowHealthPrompt(true);
+  };
+
+  const [showHealthPrompt, setShowHealthPrompt] = useState(false);
+
+  const handleHealthChoice = (connect: boolean) => {
+    try {
+      localStorage.setItem("health:connected", connect ? "true" : "false");
+      if (!connect) localStorage.setItem("health:fitness", "N/A");
+    } catch (e) {
+      // ignore storage errors
+    }
+    setShowHealthPrompt(false);
     router.push("/dashboard");
   };
 
@@ -100,6 +114,33 @@ export default function AuthPage() {
               {mode === "login" ? "Sign In" : "Create Account"}
             </button>
           </form>
+
+            {/* Health Connect Prompt Modal */}
+            {showHealthPrompt && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-lg">
+                  <h3 className="mb-3 text-lg font-semibold">Connect Health App?</h3>
+                  <p className="mb-4 text-sm text-muted">
+                    Would you like to connect your Health app so Rane can analyze
+                    activity and sleep to provide a simple fitness assessment?
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleHealthChoice(true)}
+                      className="flex-1 rounded-xl bg-indigo py-2.5 text-sm font-medium text-white"
+                    >
+                      Yes, connect
+                    </button>
+                    <button
+                      onClick={() => handleHealthChoice(false)}
+                      className="flex-1 rounded-xl border border-card-border bg-background py-2.5 text-sm font-medium"
+                    >
+                      No, thanks
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
           {/* Divider */}
           <div className="my-5 flex items-center gap-3">
