@@ -49,8 +49,8 @@ export default function AuthPage() {
             <button
               onClick={() => setMode("login")}
               className={`flex-1 rounded-xl py-2 text-sm font-medium transition-all ${mode === "login"
-                  ? "bg-card text-indigo shadow-sm"
-                  : "text-muted hover:text-foreground"
+                ? "bg-card text-indigo shadow-sm"
+                : "text-muted hover:text-foreground"
                 }`}
             >
               Sign In
@@ -58,60 +58,28 @@ export default function AuthPage() {
             <button
               onClick={() => setMode("signup")}
               className={`flex-1 rounded-xl py-2 text-sm font-medium transition-all ${mode === "signup"
-                  ? "bg-card text-indigo shadow-sm"
-                  : "text-muted hover:text-foreground"
+                ? "bg-card text-indigo shadow-sm"
+                : "text-muted hover:text-foreground"
                 }`}
             >
               Sign Up
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full rounded-xl border border-card-border bg-background/50 px-4 py-2.5 text-sm placeholder:text-muted/50 focus:border-indigo/40 focus:outline-none focus:ring-2 focus:ring-indigo/10"
-                />
-              </div>
-            )}
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full rounded-xl border border-card-border bg-background/50 px-4 py-2.5 text-sm placeholder:text-muted/50 focus:border-indigo/40 focus:outline-none focus:ring-2 focus:ring-indigo/10"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
-                className="w-full rounded-xl border border-card-border bg-background/50 px-4 py-2.5 text-sm placeholder:text-muted/50 focus:border-indigo/40 focus:outline-none focus:ring-2 focus:ring-indigo/10"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-indigo py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo/90"
+          <div className="space-y-4">
+            <a
+              href="/api/auth/login"
+              className="block w-full rounded-xl bg-indigo py-2.5 text-center text-sm font-medium text-white transition-all hover:bg-indigo/90"
             >
-              {mode === "login" ? "Sign In" : "Create Account"}
-            </button>
-          </form>
+              Sign In
+            </a>
+            <a
+              href="/api/auth/login?screen_hint=signup"
+              className="block w-full rounded-xl border border-card-border py-2.5 text-center text-sm font-medium text-foreground/70 transition-all hover:bg-background"
+            >
+              Create Account
+            </a>
+          </div>
 
           {/* Health Connect Prompt Modal */}
           {showHealthPrompt && (
