@@ -1,0 +1,232 @@
+import { WeatherInfo, DayEntry, UserProfile } from "./types";
+
+export const weatherMap: Record<string, WeatherInfo> = {
+  storms: {
+    id: "storms",
+    label: "Emotional Storms",
+    emoji: "\u26C8\uFE0F",
+    description: "Overwhelm, anxiety, irritability",
+    color: "#5B34A3",
+    bgGradient: "from-indigo/30 to-violet/20",
+  },
+  fog: {
+    id: "fog",
+    label: "Fog",
+    emoji: "\uD83C\uDF2B\uFE0F",
+    description: "Mental fatigue, indecision",
+    color: "#9AC3FF",
+    bgGradient: "from-sky-blue/30 to-card-border/20",
+  },
+  "low-tide": {
+    id: "low-tide",
+    label: "Low Tide",
+    emoji: "\uD83C\uDF0A",
+    description: "Withdrawal, numbness, inward energy",
+    color: "#9F51B7",
+    bgGradient: "from-violet/20 to-sky-blue/20",
+  },
+  gusts: {
+    id: "gusts",
+    label: "Gusts",
+    emoji: "\uD83C\uDF2C\uFE0F",
+    description: "Sensitivity, sudden mood shifts",
+    color: "#EAA2CA",
+    bgGradient: "from-blush/30 to-peach/20",
+  },
+  "clear-skies": {
+    id: "clear-skies",
+    label: "Clear Skies",
+    emoji: "\u2600\uFE0F",
+    description: "Clarity, emotional ease",
+    color: "#F5E487",
+    bgGradient: "from-sunlight/30 to-sand/20",
+  },
+};
+
+export const mockEntries: DayEntry[] = [
+  {
+    date: "2026-02-07",
+    reflection:
+      "I couldn\u2019t focus today. Every small thing felt like it needed all my energy. I kept staring at my to-do list and doing nothing. I think I\u2019m just tired of being tired.",
+    primaryWeather: "fog",
+    secondaryWeather: "low-tide",
+    explanation:
+      "Today feels like fog settling in. Mental energy may be low, especially after a demanding stretch and limited rest. There\u2019s also a quiet pull inward\u2014a low tide beneath the surface.",
+    shelterSuggestions: [
+      { text: "Rest without justification", icon: "\uD83D\uDECB\uFE0F" },
+      { text: "Reduce decisions today", icon: "\uD83E\uDDED" },
+      { text: "Choose low-stakes tasks", icon: "\uD83C\uDF3F" },
+    ],
+    guardrails: {
+      notIdeal: ["Big decisions", "Self-evaluation", "New commitments"],
+      betterSuited: ["Reflection", "Low-stakes tasks", "Saying no"],
+    },
+    closingMessage:
+      "Nothing needs fixing today. This weather will pass.",
+    context: {
+      sleepHours: 5.5,
+      activityLevel: "Low",
+      cyclePhase: "Luteal",
+    },
+  },
+  {
+    date: "2026-02-06",
+    reflection:
+      "I woke up feeling okay but by afternoon everything felt overwhelming. A work email sent me spiraling. I snapped at my partner and then felt guilty about it all evening.",
+    primaryWeather: "storms",
+    secondaryWeather: "gusts",
+    explanation:
+      "Emotional storms moved in this afternoon. A small trigger may have released tension that was already building. The sudden shift suggests gusts\u2014sensitivity running high right now.",
+    shelterSuggestions: [
+      { text: "Set a soft boundary", icon: "\uD83D\uDEE1\uFE0F" },
+      { text: "Emotional validation", icon: "\uD83D\uDC9C" },
+      { text: "Gentle expression", icon: "\uD83D\uDD8A\uFE0F" },
+    ],
+    guardrails: {
+      notIdeal: ["Confrontations", "Big decisions", "Over-explaining yourself"],
+      betterSuited: ["Quiet connection", "Saying no", "Gentle organization"],
+    },
+    closingMessage:
+      "Storms don\u2019t mean something is wrong. They mean something is moving through.",
+    context: {
+      sleepHours: 6,
+      activityLevel: "Moderate",
+      cyclePhase: "Late Luteal",
+    },
+  },
+  {
+    date: "2026-02-05",
+    reflection:
+      "Today was actually peaceful. I took a long walk, had a slow morning. Didn\u2019t feel the need to rush. It\u2019s rare but I\u2019ll take it.",
+    primaryWeather: "clear-skies",
+    explanation:
+      "Clear skies today. There\u2019s a sense of emotional ease and presence. This kind of clarity often comes when the body and mind get the space they need.",
+    shelterSuggestions: [
+      { text: "Savor this feeling", icon: "\u2728" },
+      { text: "Gentle movement", icon: "\uD83C\uDFF5\uFE0F" },
+      { text: "Connect with someone you trust", icon: "\uD83E\uDD1D" },
+    ],
+    guardrails: {
+      notIdeal: ["Overcommitting", "Ignoring your own needs"],
+      betterSuited: [
+        "Planning with care",
+        "Creative work",
+        "Meaningful conversations",
+      ],
+    },
+    closingMessage: "You\u2019re allowed to enjoy the clear days too.",
+  },
+  {
+    date: "2026-02-04",
+    reflection:
+      "I feel numb. Not sad exactly, just\u2026 empty. I went through the motions at work. Came home and just stared at the wall. I don\u2019t know what I need.",
+    primaryWeather: "low-tide",
+    explanation:
+      "The tide is low today. Energy has pulled inward and that\u2019s okay. Sometimes the body protects itself by going quiet. This isn\u2019t failure\u2014it\u2019s conservation.",
+    shelterSuggestions: [
+      { text: "Rest without justification", icon: "\uD83D\uDECB\uFE0F" },
+      { text: "Let yourself be still", icon: "\uD83C\uDF19" },
+      { text: "No productivity required", icon: "\uD83E\uDDF8" },
+    ],
+    guardrails: {
+      notIdeal: ["Self-evaluation", "Major tasks", "Emotional conversations"],
+      betterSuited: ["Gentle routine", "Rest", "Minimal expectations"],
+    },
+    closingMessage:
+      "Nothing about this defines you. Low tide always returns to shore.",
+    context: {
+      sleepHours: 7,
+      activityLevel: "Low",
+    },
+  },
+  {
+    date: "2026-02-03",
+    reflection:
+      "One minute I was fine, the next I was crying over a song. Then I was angry at myself for crying. It\u2019s like my emotions have no middle ground today.",
+    primaryWeather: "gusts",
+    explanation:
+      "Gusts are blowing through today. Emotions may feel sudden and unpredictable\u2014shifting quickly between states. This often happens during times of heightened sensitivity.",
+    shelterSuggestions: [
+      { text: "Let emotions move through", icon: "\uD83C\uDF43" },
+      { text: "Reduce stimulation", icon: "\uD83D\uDD07" },
+      { text: "Self-compassion first", icon: "\uD83D\uDC9B" },
+    ],
+    guardrails: {
+      notIdeal: ["Big decisions", "Confrontations", "Self-criticism"],
+      betterSuited: [
+        "Gentle journaling",
+        "Breathing space",
+        "Low-pressure tasks",
+      ],
+    },
+    closingMessage:
+      "You\u2019re allowed to move gently today. The gusts will settle.",
+    context: {
+      sleepHours: 6.5,
+      activityLevel: "Moderate",
+      cyclePhase: "Follicular",
+    },
+  },
+  {
+    date: "2026-02-02",
+    reflection:
+      "Had brunch with a friend. Laughed a lot. The sun was out and I actually felt hopeful for the first time in a while. Maybe things are shifting.",
+    primaryWeather: "clear-skies",
+    explanation:
+      "Clear skies are holding steady. Connection and rest seem to have opened up some emotional space. Hope is a sign the weather is lifting.",
+    shelterSuggestions: [
+      { text: "Hold onto this gently", icon: "\uD83C\uDF3B" },
+      { text: "Notice what helped", icon: "\uD83D\uDD0D" },
+      { text: "Share kindness outward", icon: "\uD83D\uDC8C" },
+    ],
+    guardrails: {
+      notIdeal: ["Overthinking", "Forcing productivity"],
+      betterSuited: ["Savoring", "Gentle planning", "Creative expression"],
+    },
+    closingMessage: "Let this warmth stay as long as it wants.",
+  },
+  {
+    date: "2026-02-01",
+    reflection:
+      "I\u2019ve been carrying so much this week. Work deadlines, family stuff, barely sleeping. I feel like I\u2019m going to snap. Everything is too loud.",
+    primaryWeather: "storms",
+    explanation:
+      "Storms are building from sustained pressure. When responsibility stacks up without relief, the emotional sky gets heavy. This isn\u2019t weakness\u2014it\u2019s overload.",
+    shelterSuggestions: [
+      { text: "Set a firm boundary", icon: "\uD83D\uDEE1\uFE0F" },
+      { text: "Ask for help", icon: "\uD83E\uDD32" },
+      { text: "Reduce your load today", icon: "\uD83D\uDCE6" },
+    ],
+    guardrails: {
+      notIdeal: [
+        "People-pleasing",
+        "Big decisions",
+        "Emotional labor for others",
+      ],
+      betterSuited: ["Protecting your energy", "Saying no", "Asking for space"],
+    },
+    closingMessage:
+      "You\u2019ve been carrying a lot. It\u2019s okay to put something down.",
+    context: {
+      sleepHours: 4.5,
+      activityLevel: "High",
+      cyclePhase: "Menstrual",
+    },
+  },
+];
+
+export const mockUser: UserProfile = {
+  name: "Arya",
+  email: "arya@example.com",
+  joinedDate: "2026-01-15",
+  healthDataEnabled: true,
+  cycleTrackingEnabled: true,
+};
+
+export function getEntryByDate(date: string): DayEntry | undefined {
+  return mockEntries.find((e) => e.date === date);
+}
+
+export function getTodayEntry(): DayEntry {
+  return mockEntries[0];
+}
