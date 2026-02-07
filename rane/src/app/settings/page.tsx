@@ -1,21 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useUser } from "@auth0/nextjs-auth0";
 import Navigation from "@/components/Navigation";
-import { mockUser } from "@/lib/mockData";
 
 export default function SettingsPage() {
-  const [healthData, setHealthData] = useState(mockUser.healthDataEnabled);
-  const [cycleTracking, setCycleTracking] = useState(
-    mockUser.cycleTrackingEnabled
-  );
+  const { user, isLoading } = useUser();
+  const [healthData, setHealthData] = useState(true);
+  const [cycleTracking, setCycleTracking] = useState(true);
   const [showSaved, setShowSaved] = useState(false);
 
   const handleSave = () => {
     setShowSaved(true);
     setTimeout(() => setShowSaved(false), 2000);
   };
+
+  const displayName = user?.name || user?.nickname || "User";
+  const displayEmail = user?.email || "";
+  const initial = displayName[0]?.toUpperCase() || "?";
 
   return (
     <div className="min-h-screen pb-24">
@@ -33,22 +35,33 @@ export default function SettingsPage() {
           <h3 className="mb-4 text-sm font-semibold tracking-wide text-muted uppercase">
             Profile
           </h3>
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo to-violet text-xl font-semibold text-white">
-              {mockUser.name[0]}
+          {isLoading ? (
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 animate-pulse rounded-full bg-card-border" />
+              <div className="space-y-2">
+                <div className="h-4 w-24 animate-pulse rounded bg-card-border" />
+                <div className="h-3 w-36 animate-pulse rounded bg-card-border" />
+              </div>
             </div>
-            <div>
-              <p className="font-medium">{mockUser.name}</p>
-              <p className="text-sm text-muted">{mockUser.email}</p>
-              <p className="text-xs text-muted/60">
-                Joined{" "}
-                {new Date(mockUser.joinedDate + "T12:00:00").toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
+          ) : (
+            <div className="flex items-center gap-4">
+              {user?.picture ? (
+                <img
+                  src={user.picture}
+                  alt={displayName}
+                  className="h-14 w-14 rounded-full"
+                />
+              ) : (
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo to-violet text-xl font-semibold text-white">
+                  {initial}
+                </div>
+              )}
+              <div>
+                <p className="font-medium">{displayName}</p>
+                <p className="text-sm text-muted">{displayEmail}</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Health Data */}
@@ -158,12 +171,12 @@ export default function SettingsPage() {
           >
             {showSaved ? "Saved!" : "Save Changes"}
           </button>
-          <Link
-            href="/auth"
+          <a
+            href="/api/auth/logout"
             className="block w-full rounded-xl border border-card-border py-3 text-center text-sm font-medium text-muted transition-all hover:bg-background"
           >
             Sign Out
-          </Link>
+          </a>
         </div>
       </main>
 
