@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import WeatherCard from "@/components/WeatherCard";
-import ShelterSuggestions from "@/components/ShelterSuggestions";
+import MentalEaseCurve from "@/components/MentalEaseCurve";
 import DecisionGuardrails from "@/components/DecisionGuardrails";
 import ClosingMessage from "@/components/ClosingMessage";
 import ContextBadge from "@/components/ContextBadge";
@@ -101,11 +101,18 @@ export default function DayPage() {
           </p>
         </div>
 
-        {/* Shelter Suggestions */}
-        <ShelterSuggestions suggestions={entry.shelterSuggestions} />
+        {/* Decision Guardrails + Suggestions */}
+        <DecisionGuardrails
+          guardrails={entry.guardrails}
+          suggestions={entry.shelterSuggestions}
+        />
 
-        {/* Decision Guardrails */}
-        <DecisionGuardrails guardrails={entry.guardrails} />
+        {/* Productivity Possibilities */}
+        <MentalEaseCurve
+          weather={entry.primaryWeather}
+          secondaryWeather={entry.secondaryWeather}
+          sleepHours={entry.context?.sleepHours}
+        />
 
         {/* Closing Message */}
         <ClosingMessage message={entry.closingMessage} />

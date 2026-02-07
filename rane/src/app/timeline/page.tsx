@@ -4,31 +4,26 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navigation from "@/components/Navigation";
+import WeatherCalendar from "@/components/WeatherCalendar";
 import { mockEntries, weatherMap } from "@/lib/mockData";
-import { WeatherState } from "@/lib/types";
-
-const allWeatherTypes: WeatherState[] = [
-  "storms",
-  "fog",
-  "low-tide",
-  "gusts",
-  "clear-skies",
-];
 
 export default function TimelinePage() {
-  const [filter, setFilter] = useState<WeatherState | "all">("all");
+  const now = new Date();
+  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [filter, setFilter] = useState("all");
 
-  const filtered =
-    filter === "all"
-      ? mockEntries
-      : mockEntries.filter((e) => e.primaryWeather === filter);
+  const allWeatherTypes = Object.keys(weatherMap);
 
-  // Count weather occurrences
-  const weatherCounts: Record<string, number> = {};
-  mockEntries.forEach((e) => {
-    weatherCounts[e.primaryWeather] =
-      (weatherCounts[e.primaryWeather] || 0) + 1;
-  });
+  const weatherCounts = mockEntries.reduce((acc, entry) => {
+    acc[entry.primaryWeather] = (acc[entry.primaryWeather] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const filtered = mockEntries.filter(
+    (entry) => filter === "all" || entry.primaryWeather === filter
+  );
+
 
   return (
     <div className="min-h-screen pb-24">
@@ -41,6 +36,7 @@ export default function TimelinePage() {
       </header>
 
       <main className="mx-auto max-w-lg px-6 pt-4">
+
         {/* Weather Distribution */}
         <div className="mb-6 rounded-2xl border border-card-border bg-card p-5">
           <h3 className="mb-3 text-sm font-semibold tracking-wide text-muted uppercase">
@@ -58,11 +54,10 @@ export default function TimelinePage() {
                   onClick={() =>
                     setFilter(filter === type ? "all" : type)
                   }
-                  className={`flex flex-1 flex-col items-center gap-1 rounded-xl p-2 transition-all ${
-                    filter === type
-                      ? "bg-indigo/10 ring-1 ring-indigo/30"
-                      : "hover:bg-background"
-                  }`}
+                  className={`flex flex-1 flex-col items-center gap-1 rounded-xl p-2 transition-all ${filter === type
+                    ? "bg-indigo/10 ring-1 ring-indigo/30"
+                    : "hover:bg-background"
+                    }`}
                 >
                   <div
                     className="w-full rounded-lg bg-gradient-to-t from-indigo/30 to-violet/20 transition-all"
@@ -116,8 +111,22 @@ export default function TimelinePage() {
           </div>
         )}
 
+
+        {/* Weather Calendar */}
+        <div className="mb-6">
+          <WeatherCalendar
+            entries={mockEntries}
+            year={calYear}
+            month={calMonth}
+            onMonthChange={(y, m) => {
+              setCalYear(y);
+              setCalMonth(m);
+            }}
+          />
+        </div>
+
         {/* Pattern Insight */}
-        <div className="mb-5 rounded-2xl bg-gradient-to-br from-indigo/8 to-violet/8 p-4">
+        <div className="rounded-2xl bg-gradient-to-br from-indigo/8 to-violet/8 p-4">
           <p className="text-sm leading-relaxed text-foreground/70">
             {"\uD83D\uDD0D"}{" "}
             <span className="font-medium">Pattern:</span> Storms tend to appear
