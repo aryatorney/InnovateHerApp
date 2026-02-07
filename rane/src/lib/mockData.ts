@@ -56,9 +56,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Today feels like fog settling in. Mental energy may be low, especially after a demanding stretch and limited rest. There\u2019s also a quiet pull inward\u2014a low tide beneath the surface.",
     shelterSuggestions: [
-      { text: "Rest without justification", icon: "\uD83D\uDECB\uFE0F" },
-      { text: "Reduce decisions today", icon: "\uD83E\uDDED" },
-      { text: "Choose low-stakes tasks", icon: "\uD83C\uDF3F" },
+      { text: "Couch mode: fully activated", icon: "\uD83D\uDECB\uFE0F" },
+      { text: "Let someone else pick dinner", icon: "\uD83C\uDF55" },
+      { text: "Doodle, scroll, or stare at a wall (all valid)", icon: "\uD83C\uDF3F" },
     ],
     guardrails: {
       notIdeal: ["Big decisions", "Self-evaluation", "New commitments"],
@@ -81,9 +81,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Emotional storms moved in this afternoon. A small trigger may have released tension that was already building. The sudden shift suggests gusts\u2014sensitivity running high right now.",
     shelterSuggestions: [
-      { text: "Set a soft boundary", icon: "\uD83D\uDEE1\uFE0F" },
-      { text: "Emotional validation", icon: "\uD83D\uDC9C" },
-      { text: "Gentle expression", icon: "\uD83D\uDD8A\uFE0F" },
+      { text: "Reply to that email tomorrow (it can wait)", icon: "\uD83D\uDCEC" },
+      { text: "Text a friend something silly", icon: "\uD83D\uDC9C" },
+      { text: "Write it out, even if it's just angry scribbles", icon: "\uD83D\uDD8A\uFE0F" },
     ],
     guardrails: {
       notIdeal: ["Confrontations", "Big decisions", "Over-explaining yourself"],
@@ -105,9 +105,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Clear skies today. There\u2019s a sense of emotional ease and presence. This kind of clarity often comes when the body and mind get the space they need.",
     shelterSuggestions: [
-      { text: "Savor this feeling", icon: "\u2728" },
-      { text: "Gentle movement", icon: "\uD83C\uDFF5\uFE0F" },
-      { text: "Connect with someone you trust", icon: "\uD83E\uDD1D" },
+      { text: "Bottle this feeling (figuratively)", icon: "\u2728" },
+      { text: "Take the long way home", icon: "\uD83C\uDFF5\uFE0F" },
+      { text: "Call that person you've been meaning to call", icon: "\uD83E\uDD1D" },
     ],
     guardrails: {
       notIdeal: ["Overcommitting", "Ignoring your own needs"],
@@ -127,9 +127,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "The tide is low today. Energy has pulled inward and that\u2019s okay. Sometimes the body protects itself by going quiet. This isn\u2019t failure\u2014it\u2019s conservation.",
     shelterSuggestions: [
-      { text: "Rest without justification", icon: "\uD83D\uDECB\uFE0F" },
-      { text: "Let yourself be still", icon: "\uD83C\uDF19" },
-      { text: "No productivity required", icon: "\uD83E\uDDF8" },
+      { text: "Blanket burrito mode", icon: "\uD83D\uDECB\uFE0F" },
+      { text: "Put on that comfort show for the 100th time", icon: "\uD83C\uDF19" },
+      { text: "Snacks count as self-care today", icon: "\uD83E\uDDF8" },
     ],
     guardrails: {
       notIdeal: ["Self-evaluation", "Major tasks", "Emotional conversations"],
@@ -150,9 +150,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Gusts are blowing through today. Emotions may feel sudden and unpredictable\u2014shifting quickly between states. This often happens during times of heightened sensitivity.",
     shelterSuggestions: [
-      { text: "Let emotions move through", icon: "\uD83C\uDF43" },
-      { text: "Reduce stimulation", icon: "\uD83D\uDD07" },
-      { text: "Self-compassion first", icon: "\uD83D\uDC9B" },
+      { text: "Cry to the song again, honestly why not", icon: "\uD83C\uDF43" },
+      { text: "Noise-canceling headphones are your friend", icon: "\uD83C\uDFA7" },
+      { text: "Be as nice to yourself as you'd be to your dog", icon: "\uD83D\uDC9B" },
     ],
     guardrails: {
       notIdeal: ["Big decisions", "Confrontations", "Self-criticism"],
@@ -178,9 +178,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Clear skies are holding steady. Connection and rest seem to have opened up some emotional space. Hope is a sign the weather is lifting.",
     shelterSuggestions: [
-      { text: "Hold onto this gently", icon: "\uD83C\uDF3B" },
-      { text: "Notice what helped", icon: "\uD83D\uDD0D" },
-      { text: "Share kindness outward", icon: "\uD83D\uDC8C" },
+      { text: "Send that 'thinking of you' text", icon: "\uD83D\uDC8C" },
+      { text: "Make a playlist of today's vibe", icon: "\uD83C\uDFB6" },
+      { text: "Treat yourself to that little thing", icon: "\uD83C\uDF3B" },
     ],
     guardrails: {
       notIdeal: ["Overthinking", "Forcing productivity"],
@@ -196,9 +196,9 @@ export const mockEntries: DayEntry[] = [
     explanation:
       "Storms are building from sustained pressure. When responsibility stacks up without relief, the emotional sky gets heavy. This isn\u2019t weakness\u2014it\u2019s overload.",
     shelterSuggestions: [
-      { text: "Set a firm boundary", icon: "\uD83D\uDEE1\uFE0F" },
-      { text: "Ask for help", icon: "\uD83E\uDD32" },
-      { text: "Reduce your load today", icon: "\uD83D\uDCE6" },
+      { text: "'No' is a full sentence today", icon: "\uD83D\uDEE1\uFE0F" },
+      { text: "Delegate like a CEO (even if it's just dishes)", icon: "\uD83E\uDD32" },
+      { text: "Tomorrow-you can handle it, today-you rests", icon: "\uD83D\uDCE6" },
     ],
     guardrails: {
       notIdeal: [

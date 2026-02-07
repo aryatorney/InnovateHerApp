@@ -10,7 +10,7 @@ export default function ShelterSuggestions({
   return (
     <div className="rounded-2xl border border-card-border bg-card p-5">
       <h3 className="mb-3 text-sm font-semibold tracking-wide text-muted uppercase">
-        Shelter Suggestions
+        Suggestions
       </h3>
       <div className="space-y-2.5">
         {suggestions.map((s, i) => (
