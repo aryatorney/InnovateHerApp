@@ -9,6 +9,8 @@ import DecisionGuardrails from "@/components/DecisionGuardrails";
 import ClosingMessage from "@/components/ClosingMessage";
 import ContextBadge from "@/components/ContextBadge";
 import { getEntryByDate, mockEntries } from "@/lib/mockData";
+import { ElevenLabsAgent } from '@/components/ElevenLabsAgent';
+
 
 export default function DayPage() {
   const params = useParams();
@@ -145,4 +147,5 @@ export default function DayPage() {
       <Navigation />
     </div>
   );
+  
 }

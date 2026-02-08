@@ -1,5 +1,3 @@
-"use client";
-
 import Navigation from "@/components/Navigation";
 import WeatherCard from "@/components/WeatherCard";
 import MentalEaseCurve from "@/components/MentalEaseCurve";
@@ -7,6 +5,7 @@ import DecisionGuardrails from "@/components/DecisionGuardrails";
 import ClosingMessage from "@/components/ClosingMessage";
 import ContextBadge from "@/components/ContextBadge";
 import { getTodayEntry } from "@/lib/mockData";
+import { ElevenLabsAgent } from '@/components/ElevenLabsAgent';
 
 export default function TodayPage() {
   const entry = getTodayEntry();
@@ -70,6 +69,11 @@ export default function TodayPage() {
 
         {/* Closing Message */}
         <ClosingMessage message={entry.closingMessage} />
+
+        {/* ElevenLabs voice agent (floating) + Conversation UI */}
+        <aside>
+          <ElevenLabsAgent />
+        </aside>
       </main>
 
       <Navigation />
