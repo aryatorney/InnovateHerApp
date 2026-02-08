@@ -10,6 +10,7 @@ interface ReflectionInputProps {
 export default function ReflectionInput({ initialText }: ReflectionInputProps) {
   const [text, setText] = useState(initialText || "");
   const [submitted, setSubmitted] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [editing, setEditing] = useState(!initialText);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -17,9 +18,31 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
   const handleSubmit = async () => {
     if (!text.trim()) return;
     setError("");
-    setSubmitted(true);
+    setAnalyzing(true);
 
     try {
+      // 1. Get AI Interpretation
+      let aiData = {};
+      try {
+        const aiRes = await fetch("/api/ai/interpret", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reflection: text.trim() }),
+        });
+
+        if (aiRes.ok) {
+          aiData = await aiRes.json();
+        } else {
+          console.warn("AI interpretation failed, falling back to basic entry");
+        }
+      } catch (aiError) {
+        console.warn("AI interpretation error:", aiError);
+      }
+
+      // 2. Save Entry (Upsert via API)
+      setAnalyzing(false);
+      setSubmitted(true);
+
       const today = new Date().toISOString().split("T")[0];
       const res = await fetch("/api/entries", {
         method: "POST",
@@ -27,6 +50,7 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
         body: JSON.stringify({
           date: today,
           text: text.trim(),
+          ...aiData, // Merge AI insights
         }),
       });
 
@@ -43,16 +67,19 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
         router.push("/today");
       }, 1200);
     } catch (e) {
+      setAnalyzing(false);
       setSubmitted(false);
       setError(e instanceof Error ? e.message : "Something went wrong");
     }
   };
 
-  if (submitted) {
+  if (submitted || analyzing) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-3xl border border-card-border bg-card p-8">
         <div className="animate-pulse text-4xl">{"\u2601\uFE0F"}</div>
-        <p className="text-sm text-muted">Reading the weather...</p>
+        <p className="text-sm text-muted">
+          {analyzing ? "Interpreting your inner weather..." : "Reading the weather..."}
+        </p>
       </div>
     );
   }
@@ -99,7 +126,7 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
           </span>
           <button
             onClick={handleSubmit}
-            disabled={!text.trim()}
+            disabled={!text.trim() || analyzing}
             className="rounded-full bg-indigo px-5 py-1.5 text-xs font-medium text-white transition-all hover:bg-indigo/90 disabled:opacity-50"
           >
             Reflect
