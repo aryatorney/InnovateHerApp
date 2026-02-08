@@ -59,6 +59,7 @@ export default function TodayPage() {
         <DecisionGuardrails
           guardrails={entry.guardrails}
           suggestions={entry.shelterSuggestions}
+          cyclePhase={entry.context?.cyclePhase}
         />
 
         {/* Productivity Possibilities */}

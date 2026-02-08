@@ -105,6 +105,7 @@ export default function DayPage() {
         <DecisionGuardrails
           guardrails={entry.guardrails}
           suggestions={entry.shelterSuggestions}
+          cyclePhase={entry.context?.cyclePhase}
         />
 
         {/* Productivity Possibilities */}
