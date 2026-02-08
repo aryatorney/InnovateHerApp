@@ -4,6 +4,7 @@ import { DayEntry } from "@/lib/types";
 // Extends DayEntry but Mongoose documents have _id
 export interface IEntry extends DayEntry, mongoose.Document {
     userId?: string;
+    aiInsights?: any;
 }
 
 const EntrySchema = new Schema<IEntry>(
@@ -39,6 +40,7 @@ const EntrySchema = new Schema<IEntry>(
         // We add a user field to associate with Auth0 user later
         // For now, we'll keep it simple as per request
         userId: { type: String, required: true, index: true },
+        aiInsights: { type: Schema.Types.Mixed }, // Flexible storage for AI response
     },
     { timestamps: true }
 );

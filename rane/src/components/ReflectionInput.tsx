@@ -21,28 +21,7 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
     setAnalyzing(true);
 
     try {
-      // 1. Get AI Interpretation
-      let aiData = {};
-      try {
-        const aiRes = await fetch("/api/ai/interpret", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reflection: text.trim() }),
-        });
-
-        if (aiRes.ok) {
-          aiData = await aiRes.json();
-        } else {
-          console.warn("AI interpretation failed, falling back to basic entry");
-        }
-      } catch (aiError) {
-        console.warn("AI interpretation error:", aiError);
-      }
-
-      // 2. Save Entry (Upsert via API)
-      setAnalyzing(false);
-      setSubmitted(true);
-
+      // 1. Save Entry (Backend now handles AI)
       const today = new Date().toISOString().split("T")[0];
       const res = await fetch("/api/entries", {
         method: "POST",
@@ -50,22 +29,24 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
         body: JSON.stringify({
           date: today,
           text: text.trim(),
-          ...aiData, // Merge AI insights
         }),
       });
 
       if (!res.ok) {
         const data = await res.json();
         if (res.status === 409) {
-          router.push("/today");
+          window.location.href = "/today";
           return;
         }
         throw new Error(data.error || "Failed to save");
       }
 
+      setSubmitted(true);
+
+      // Full reload to show AI-generated insights
       setTimeout(() => {
-        router.push("/today");
-      }, 1200);
+        window.location.href = "/today";
+      }, 1500);
     } catch (e) {
       setAnalyzing(false);
       setSubmitted(false);
@@ -78,7 +59,7 @@ export default function ReflectionInput({ initialText }: ReflectionInputProps) {
       <div className="flex flex-col items-center gap-4 rounded-3xl border border-card-border bg-card p-8">
         <div className="animate-pulse text-4xl">{"\u2601\uFE0F"}</div>
         <p className="text-sm text-muted">
-          {analyzing ? "Interpreting your inner weather..." : "Reading the weather..."}
+          {analyzing ? "Reading your inner weather..." : "Saved!"}
         </p>
       </div>
     );

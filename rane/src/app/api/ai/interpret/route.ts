@@ -1,133 +1,104 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth0 } from "@/lib/auth0";
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
-// Schema definition for structured output
-const schema = {
-    description: "Interpretation of user reflection into inner weather and guidance",
-    type: SchemaType.OBJECT,
-    properties: {
-        primaryWeather: {
-            type: SchemaType.STRING,
-            enum: ["storms", "fog", "low-tide", "gusts", "clear-skies"],
-            description: "The dominant emotional state",
-        },
-        secondaryWeather: {
-            type: SchemaType.STRING,
-            enum: ["storms", "fog", "low-tide", "gusts", "clear-skies"],
-            description: "A secondary, underlying emotional state (optional)",
-            nullable: true,
-        },
-        explanation: {
-            type: SchemaType.STRING,
-            description: "A gentle, validating explanation of why this weather matches their reflection (2-3 sentences)",
-        },
-        shelterSuggestions: {
-            type: SchemaType.ARRAY,
-            description: "3 actionable, low-pressure suggestions",
-            items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                    text: { type: SchemaType.STRING },
-                    icon: { type: SchemaType.STRING, description: "A relevant emoji" },
-                },
-                required: ["text", "icon"],
-            },
-        },
-        guardrails: {
-            type: SchemaType.OBJECT,
-            properties: {
-                notIdeal: {
-                    type: SchemaType.ARRAY,
-                    items: { type: SchemaType.STRING },
-                    description: "Activities to avoid given the current state (e.g., big decisions)",
-                },
-                betterSuited: {
-                    type: SchemaType.ARRAY,
-                    items: { type: SchemaType.STRING },
-                    description: "Activities that align well with the current state",
-                },
-            },
-            required: ["notIdeal", "betterSuited"],
-        },
-        closingMessage: {
-            type: SchemaType.STRING,
-            description: "A short, encouraging closing thought (1 sentence)",
-        },
-        context: {
-            type: SchemaType.OBJECT,
-            description: "Inferred context from the reflection",
-            properties: {
-                sleepHours: { type: SchemaType.NUMBER, nullable: true },
-                activityLevel: { type: SchemaType.STRING, enum: ["low", "moderate", "high"], nullable: true },
-                cyclePhase: { type: SchemaType.STRING, enum: ["menstrual", "follicular", "ovulatory", "luteal"], nullable: true },
-            },
-        }
-    },
-    required: ["primaryWeather", "explanation", "shelterSuggestions", "guardrails", "closingMessage"],
-};
+const VALID_KEYWORDS = [
+    "productivity", "mood", "energy", "routine", "feel", "tired", "happy", "sad", "anxious",
+    "work", "focus", "sleep", "dream", "stress", "calm", "excited", "bored", "weather",
+    "inner", "reflection", "journal", "thought", "mind", "schedule", "plan", "goal",
+    "overwhelm", "fog", "heavy", "light", "rest", "busy", "exhaust", "motivat", "procrastinat",
+];
 
 export async function POST(req: Request) {
     try {
-        // 1. Verify Authentication
+        // 1. Auth check
         const session = await auth0.getSession();
         if (!session?.user && process.env.NODE_ENV !== "development") {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // 2. Parse Input
-        const { reflection } = await req.json();
-        if (!reflection) {
-            return NextResponse.json({ error: "Reflection text is required" }, { status: 400 });
+        // 2. Parse & validate input
+        const body = await req.json();
+        const entryText = body.entryText;
+
+        if (!entryText || typeof entryText !== "string") {
+            return NextResponse.json({ error: "entryText is required and must be a string" }, { status: 400 });
         }
 
-        // 3. Call Gemini
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: schema as any,
-            },
-        });
+        const trimmed = entryText.trim();
 
-        const prompt = `
-      Analyze the following user reflection and map it to an "inner weather" state.
-      Be gentle, validating, and poetic but grounded.
-      
-      User Reflection: "${reflection}"
-      
-      Definitions:
-      - storms: Overwhelm, anxiety, irritability, high energy but chaotic.
-      - fog: Mental fatigue, indecision, confusion, disconnect.
-      - low-tide: Withdrawal, numbness, sadness, low energy, need for rest.
-      - gusts: Sensitivity, sudden mood shifts, emotional volatility.
-      - clear-skies: Clarity, emotional ease, balance, readiness.
+        if (trimmed.length < 10) {
+            return NextResponse.json({ error: "Input too short. Please provide at least 10 characters." }, { status: 400 });
+        }
 
-      Provide 3 shelter suggestions.
-      Provide decision guardrails (what to avoid vs what to do).
-      Infer context (sleep, cycle) ONLY if explicitly mentioned.
-    `;
+        if (trimmed.length > 5000) {
+            return NextResponse.json({ error: "Input too long. Maximum 5000 characters." }, { status: 400 });
+        }
+
+        const lower = trimmed.toLowerCase();
+        const hasKeyword = VALID_KEYWORDS.some(kw => lower.includes(kw));
+        if (!hasKeyword) {
+            return NextResponse.json({ error: "Input appears unrelated to productivity, mood, energy, or routine." }, { status: 400 });
+        }
+
+        // 3. Check API key
+        if (!process.env.GEMINI_API_KEY) {
+            return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
+        }
+
+        // 4. Call Gemini
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+        const prompt = `You are a productivity analyst. Analyze the following journal entry and return ONLY valid JSON with no markdown, no emojis, and no extra text.
+
+If the input is unrelated to productivity, mood, energy, or routine, return: {"error": "Unrelated input"}
+
+Otherwise return exactly this structure:
+{
+  "morning": {
+    "productivityLevel": "low" | "medium" | "high",
+    "insight": "short insight about morning productivity based on the entry",
+    "suggestion": "one actionable suggestion for the morning"
+  },
+  "midday": {
+    "productivityLevel": "low" | "medium" | "high",
+    "insight": "short insight about midday productivity based on the entry",
+    "suggestion": "one actionable suggestion for midday"
+  },
+  "evening": {
+    "productivityLevel": "low" | "medium" | "high",
+    "insight": "short insight about evening productivity based on the entry",
+    "suggestion": "one actionable suggestion for the evening"
+  }
+}
+
+Journal entry: "${trimmed.replace(/"/g, '\\"')}"`;
 
         const result = await model.generateContent({
-            contents: [
-                {
-                    role: "user",
-                    parts: [{ text: prompt }]
-                }
-            ]
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
         });
-        const output = JSON.parse(result.response.text());
 
-        // 4. Return Structured Data (No DB Write)
-        return NextResponse.json(output);
+        const raw = result.response.text();
+        const output = JSON.parse(raw);
 
-    } catch (error) {
-        console.error("Gemini API Error:", error);
+        // 5. If Gemini flagged it as unrelated
+        if (output.error) {
+            return NextResponse.json({ error: output.error }, { status: 400 });
+        }
+
+        return NextResponse.json({ output });
+
+    } catch (error: any) {
+        console.error("Interpret API Error:", error?.message || error);
+
+        // Distinguish parse errors from Gemini failures
+        if (error instanceof SyntaxError) {
+            return NextResponse.json({ error: "Gemini returned invalid JSON" }, { status: 502 });
+        }
+
         return NextResponse.json(
-            { error: "Failed to interpret reflection" },
+            { error: "Failed to interpret entry", detail: error?.message || String(error) },
             { status: 500 }
         );
     }
