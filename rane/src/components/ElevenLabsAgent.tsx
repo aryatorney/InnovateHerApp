@@ -20,7 +20,10 @@ export const ElevenLabsAgent = () => {
       if (data.signedUrl) {
         await startSession({ signedUrl: data.signedUrl });
       } else if (data.agentId) {
-        await startSession({ agentId: data.agentId });
+        // @ts-expect-error - Fallback to WebRTC if no signed URL
+        await startSession({
+          agentId: data.agentId
+        });
       } else {
         setUnavailable(true);
       }
