@@ -35,14 +35,14 @@ export const ElevenLabsAgent = () => {
         <button
           onClick={handleStart}
           disabled={connected}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+          className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet/90 disabled:bg-gray-400"
         >
           {connected ? 'Connected' : 'Start'}
         </button>
         <button
           onClick={handleStop}
           disabled={!connected}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+          className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
         >
           Stop
         </button>
