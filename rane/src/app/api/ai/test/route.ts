@@ -27,10 +27,10 @@ export async function POST(req: Request) {
         const output = result.response.text();
 
         return NextResponse.json({ output });
-    } catch (error) {
-        console.error("Gemini Test Error:", error);
+    } catch (error: any) {
+        console.error("Gemini Test Error:", error?.message || error);
         return NextResponse.json(
-            { error: "Failed to generate response" },
+            { error: "Failed to generate response", detail: error?.message || String(error) },
             { status: 500 }
         );
     }
