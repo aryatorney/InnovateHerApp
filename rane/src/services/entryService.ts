@@ -34,7 +34,7 @@ async function generateAnalysis(reflection: string): Promise<Record<string, any>
         console.log("[entryService] Skipping AI: reflection too short");
         return null;
     }
-    console.log("[entryService] Calling Gemini for analysis...");
+    console.log("[entryService] Calling Gemini for analysis... (Prompt v2)");
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -46,11 +46,29 @@ async function generateAnalysis(reflection: string): Promise<Record<string, any>
             },
         });
 
-        const prompt = `Analyze this journal entry. Return ONLY valid JSON, no markdown, no code blocks.
-Keep all text fields concise (under 20 words each).
+        const prompt = `You are an emotional weather analyst. Analyze this journal entry. Return ONLY valid JSON, no markdown, no code blocks.
 
 Return this exact structure:
-{"primaryWeather":"storms|fog|low-tide|gusts|clear-skies","secondaryWeather":"storms|fog|low-tide|gusts|clear-skies|null","explanation":"2-3 sentence gentle explanation of why this weather matches","shelterSuggestions":[{"text":"suggestion","icon":"emoji"},{"text":"suggestion","icon":"emoji"},{"text":"suggestion","icon":"emoji"}],"guardrails":{"notIdeal":["thing to avoid","thing to avoid"],"betterSuited":["good activity","good activity","good activity"]},"closingMessage":"one encouraging sentence","productivity":{"morning":{"productivityLevel":"low|medium|high","insight":"short insight","suggestion":"short suggestion"},"midday":{"productivityLevel":"low|medium|high","insight":"short insight","suggestion":"short suggestion"},"evening":{"productivityLevel":"low|medium|high","insight":"short insight","suggestion":"short suggestion"}}}
+{
+  "primaryWeather": "storms" | "fog" | "low-tide" | "gusts" | "clear-skies",
+  "secondaryWeather": "storms" | "fog" | "low-tide" | "gusts" | "clear-skies" | null,
+  "explanation": "2-3 sentence gentle explanation of why this weather matches",
+  "shelterSuggestions": [
+    { "text": "suggestion 1", "icon": "emoji" },
+    { "text": "suggestion 2", "icon": "emoji" },
+    { "text": "suggestion 3", "icon": "emoji" }
+  ],
+  "guardrails": {
+    "notIdeal": ["thing to avoid 1", "thing to avoid 2"],
+    "betterSuited": ["good activity 1", "good activity 2", "good activity 3"]
+  },
+  "closingMessage": "one encouraging sentence",
+  "productivity": {
+    "morning": { "productivityLevel": "low" | "medium" | "high", "insight": "insight", "suggestion": "suggestion" },
+    "midday": { "productivityLevel": "low" | "medium" | "high", "insight": "insight", "suggestion": "suggestion" },
+    "evening": { "productivityLevel": "low" | "medium" | "high", "insight": "insight", "suggestion": "suggestion" }
+  }
+}
 
 Weather definitions:
 - storms: Overwhelm, anxiety, irritability, chaotic energy
@@ -58,6 +76,8 @@ Weather definitions:
 - low-tide: Withdrawal, numbness, sadness, low energy
 - gusts: Sensitivity, sudden mood shifts, emotional volatility
 - clear-skies: Clarity, emotional ease, balance, readiness
+
+If the input is too short or unrelated, make your best guess based on tone, default to 'fog'.
 
 Entry: "${reflection.replace(/"/g, '\\"')}"`;
 

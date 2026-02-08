@@ -27,6 +27,7 @@ export async function GET() {
                 lastPeriodStart: null,
                 cycleLength: 28,
                 healthDataEnabled: false,
+                hasSetPreferences: false,
             });
         }
 
@@ -35,6 +36,7 @@ export async function GET() {
             lastPeriodStart: prefs.lastPeriodStart,
             cycleLength: prefs.cycleLength,
             healthDataEnabled: prefs.healthDataEnabled,
+            hasSetPreferences: true,
         });
     } catch (error) {
         console.error("GET /api/preferences error:", error);
