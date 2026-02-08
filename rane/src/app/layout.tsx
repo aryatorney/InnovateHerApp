@@ -4,6 +4,7 @@ import { Auth0Provider } from "@auth0/nextjs-auth0";
 import AppShell from "@/components/AppShell";
 import "./globals.css";
 
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],

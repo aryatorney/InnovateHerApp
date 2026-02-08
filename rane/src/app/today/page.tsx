@@ -126,9 +126,9 @@ export default function TodayPage() {
         <aside>
           <ElevenLabsAgent />
         </aside>
-      </main>
+      </main >
 
       <Navigation />
-    </div>
+    </div >
   );
 }

@@ -45,7 +45,7 @@ export default function DayPage() {
         const entries = Array.isArray(data) ? data : [];
         setAllDates(entries.map((e: DayEntry) => e.date));
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [dateStr]);
 
   if (loading) {
@@ -188,4 +188,5 @@ export default function DayPage() {
       <Navigation />
     </div>
   );
+
 }
