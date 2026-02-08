@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Auth0Provider } from "@auth0/nextjs-auth0";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 
@@ -22,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <Auth0Provider>
+          <AppShell>{children}</AppShell>
+        </Auth0Provider>
       </body>
     </html>
   );
