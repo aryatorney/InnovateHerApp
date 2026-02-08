@@ -1,15 +1,72 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import WeatherCard from "@/components/WeatherCard";
 import MentalEaseCurve from "@/components/MentalEaseCurve";
 import DecisionGuardrails from "@/components/DecisionGuardrails";
 import ClosingMessage from "@/components/ClosingMessage";
 import ContextBadge from "@/components/ContextBadge";
-import { getTodayEntry } from "@/lib/mockData";
+import ReflectionInput from "@/components/ReflectionInput";
+import { DayEntry } from "@/lib/types";
+import { ElevenLabsAgent } from "@/components/ElevenLabsAgent";
 
 export default function TodayPage() {
-  const entry = getTodayEntry();
+  const [entry, setEntry] = useState<DayEntry | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [noEntry, setNoEntry] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/entries/today")
+      .then((r) => {
+        if (r.status === 404) {
+          setNoEntry(true);
+          setLoading(false);
+          return null;
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (data) {
+          setEntry(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pb-24 flex items-center justify-center">
+        <div className="animate-pulse text-4xl">{"\u2601\uFE0F"}</div>
+        <Navigation />
+      </div>
+    );
+  }
+
+  if (noEntry || !entry) {
+    return (
+      <div className="min-h-screen pb-24">
+        <header className="px-6 pt-8 pb-2">
+          <div className="mx-auto max-w-lg">
+            <p className="text-sm text-muted">
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+            <h1 className="text-2xl font-semibold">Today&apos;s Weather</h1>
+          </div>
+        </header>
+        <main className="mx-auto max-w-lg space-y-5 px-6 pt-4">
+          <ReflectionInput />
+        </main>
+        <Navigation />
+      </div>
+    );
+  }
+
   const date = new Date(entry.date + "T12:00:00");
 
   return (
@@ -46,14 +103,7 @@ export default function TodayPage() {
         />
 
         {/* Your Reflection */}
-        <div className="rounded-2xl border border-card-border bg-card p-5">
-          <h3 className="mb-2 text-sm font-semibold tracking-wide text-muted uppercase">
-            Your Reflection
-          </h3>
-          <p className="text-sm leading-relaxed text-foreground/70">
-            {entry.reflection}
-          </p>
-        </div>
+        <ReflectionInput initialText={entry.reflection} />
 
         {/* Decision Guardrails + Suggestions */}
         <DecisionGuardrails
@@ -71,6 +121,11 @@ export default function TodayPage() {
 
         {/* Closing Message */}
         <ClosingMessage message={entry.closingMessage} />
+
+        {/* ElevenLabs voice agent (floating) */}
+        <aside>
+          <ElevenLabsAgent />
+        </aside>
       </main>
 
       <Navigation />

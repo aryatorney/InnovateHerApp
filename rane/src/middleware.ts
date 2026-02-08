@@ -3,6 +3,14 @@ import { auth0 } from "@/lib/auth0";
 
 export async function middleware(req: NextRequest) {
   try {
+    const isDev = process.env.NODE_ENV === "development";
+
+    // Rewrite /api/auth/me to /api/auth/dev-me in development
+    // Must be BEFORE Auth0 middleware check so it intercepts the request
+    if (isDev && req.nextUrl.pathname === "/api/auth/me") {
+      return NextResponse.rewrite(new URL("/api/auth/dev-me", req.url));
+    }
+
     const authRes = await auth0.middleware(req);
 
     // If the Auth0 middleware handled the request (auth routes), return its response
@@ -10,11 +18,17 @@ export async function middleware(req: NextRequest) {
       return authRes;
     }
 
+    // API routes handle their own auth — let them through to return JSON errors
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+      return authRes;
+    }
+
     // Public routes that don't require authentication
-    const publicPaths = ["/auth"];
+    const publicPaths = ["/auth", "/test-api", "/today", "/api/auth/me"];
     const isPublic = publicPaths.some((p) => req.nextUrl.pathname.startsWith(p));
 
-    if (isPublic) {
+
+    if (isPublic || isDev) {
       return authRes;
     }
 

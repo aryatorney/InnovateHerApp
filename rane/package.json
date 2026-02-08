@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.14.1",
+    "@elevenlabs/react": "^0.14.0",
+    "framer-motion": "^12.33.0",
+    "mongoose": "^9.1.6",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -19,6 +22,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.4",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",

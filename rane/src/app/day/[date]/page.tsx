@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Navigation from "@/components/Navigation";
@@ -8,14 +9,55 @@ import MentalEaseCurve from "@/components/MentalEaseCurve";
 import DecisionGuardrails from "@/components/DecisionGuardrails";
 import ClosingMessage from "@/components/ClosingMessage";
 import ContextBadge from "@/components/ContextBadge";
-import { getEntryByDate, mockEntries } from "@/lib/mockData";
+import { DayEntry } from "@/lib/types";
 
 export default function DayPage() {
   const params = useParams();
   const dateStr = params.date as string;
-  const entry = getEntryByDate(dateStr);
+  const [entry, setEntry] = useState<DayEntry | null>(null);
+  const [allDates, setAllDates] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!entry) {
+  useEffect(() => {
+    // Fetch the specific entry
+    fetch(`/api/entries/${dateStr}`)
+      .then((r) => {
+        if (r.status === 404) {
+          setNotFound(true);
+          setLoading(false);
+          return null;
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (data) {
+          setEntry(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => setLoading(false));
+
+    // Fetch all entries to get prev/next navigation dates
+    fetch("/api/entries")
+      .then((r) => r.json())
+      .then((data) => {
+        const entries = Array.isArray(data) ? data : [];
+        setAllDates(entries.map((e: DayEntry) => e.date));
+      })
+      .catch(() => {});
+  }, [dateStr]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pb-24 flex items-center justify-center">
+        <div className="animate-pulse text-4xl">{"\u2601\uFE0F"}</div>
+        <Navigation />
+      </div>
+    );
+  }
+
+  if (notFound || !entry) {
     return (
       <div className="min-h-screen pb-24">
         <header className="px-6 pt-8 pb-2">
@@ -47,9 +89,9 @@ export default function DayPage() {
   }
 
   const date = new Date(entry.date + "T12:00:00");
-  const currentIndex = mockEntries.findIndex((e) => e.date === dateStr);
-  const prevEntry = mockEntries[currentIndex + 1];
-  const nextEntry = mockEntries[currentIndex - 1];
+  const currentIndex = allDates.indexOf(dateStr);
+  const prevDate = currentIndex >= 0 ? allDates[currentIndex + 1] : undefined;
+  const nextDate = currentIndex > 0 ? allDates[currentIndex - 1] : undefined;
 
   return (
     <div className="min-h-screen pb-24">
@@ -120,9 +162,9 @@ export default function DayPage() {
 
         {/* Day Navigation */}
         <div className="flex items-center justify-between pt-2">
-          {prevEntry ? (
+          {prevDate ? (
             <Link
-              href={`/day/${prevEntry.date}`}
+              href={`/day/${prevDate}`}
               className="text-sm text-indigo hover:underline"
             >
               {"\u2190"} Previous Day
@@ -130,9 +172,9 @@ export default function DayPage() {
           ) : (
             <span />
           )}
-          {nextEntry ? (
+          {nextDate ? (
             <Link
-              href={`/day/${nextEntry.date}`}
+              href={`/day/${nextDate}`}
               className="text-sm text-indigo hover:underline"
             >
               Next Day {"\u2192"}

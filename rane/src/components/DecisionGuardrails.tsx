@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { DecisionGuardrail, ShelterSuggestion } from "@/lib/types";
 

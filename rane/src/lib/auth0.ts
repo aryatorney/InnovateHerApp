@@ -8,4 +8,10 @@ export const auth0 = new Auth0Client({
     callback: "/api/auth/callback",
     logout: "/api/auth/logout",
   },
+  session: {
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
+  },
 });

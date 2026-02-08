@@ -1,15 +1,16 @@
-import { mockEntries } from "./mockData";
-
 export interface FitnessResult {
   fitnessLevel: "Excellent" | "Good" | "Average" | "Low";
   score: number; // 0-100
 }
 
+interface EntryContext {
+  sleepHours?: number;
+  activityLevel?: string;
+}
+
 // Simple heuristic analyzer using recent entries sleepHours and activityLevel
-export function analyzeHealthData(): FitnessResult {
-  const entriesWithContext = mockEntries
-    .map((e) => e.context)
-    .filter(Boolean) as { sleepHours?: number; activityLevel?: string }[];
+export function analyzeHealthData(contexts: EntryContext[] = []): FitnessResult {
+  const entriesWithContext = contexts.filter(Boolean);
 
   if (!entriesWithContext.length) {
     return { fitnessLevel: "Average", score: 50 };
