@@ -86,7 +86,7 @@ export async function POST(req: Request) {
 
         // 3. Call Gemini
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash-exp", // or "gemini-1.5-flash" if 2.0 is not available yet
+            model: "models/gemini-1.5-flash",
             generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: schema as any,
@@ -111,7 +111,14 @@ export async function POST(req: Request) {
       Infer context (sleep, cycle) ONLY if explicitly mentioned.
     `;
 
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent({
+            contents: [
+                {
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }
+            ]
+        });
         const output = JSON.parse(result.response.text());
 
         // 4. Return Structured Data (No DB Write)
