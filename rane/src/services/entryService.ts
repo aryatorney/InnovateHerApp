@@ -1,6 +1,8 @@
 import connectDB from "@/lib/db";
 import Entry, { IEntry } from "@/models/Entry";
+import UserPreferences from "@/models/UserPreferences";
 import { DayEntry } from "@/lib/types";
+import { predictCyclePhase } from "@/lib/cycleUtils";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const PENDING_DEFAULTS = {
@@ -98,6 +100,15 @@ function applyAnalysis(entry: IEntry, analysis: Record<string, any>) {
 export async function createEntry(userId: string, data: Partial<DayEntry> & { text?: string }): Promise<IEntry> {
     await connectDB();
 
+    // Auto-include cycle phase from user preferences
+    const prefs = await UserPreferences.findOne({ userId });
+    if (prefs?.cycleTrackingEnabled && prefs.lastPeriodStart) {
+        const phase = predictCyclePhase(prefs.lastPeriodStart, prefs.cycleLength);
+        if (phase) {
+            data.context = { ...data.context, cyclePhase: phase };
+        }
+    }
+
     const date = data.date || new Date().toISOString().split("T")[0];
     const reflection = data.text || data.reflection || "No reflection provided.";
 
@@ -156,7 +167,31 @@ export async function createEntry(userId: string, data: Partial<DayEntry> & { te
 
 export async function getEntryByDate(userId: string, date: string): Promise<IEntry | null> {
     await connectDB();
-    return await Entry.findOne({ userId, date }).exec();
+    const entry = await Entry.findOne({ userId, date }).exec();
+
+    if (entry) {
+        // Runtime backfill: if cycle phase is missing but user has it enabled, add it to the returned object
+        if (!entry.context?.cyclePhase) {
+            try {
+                const prefs = await UserPreferences.findOne({ userId });
+                if (prefs?.cycleTrackingEnabled && prefs.lastPeriodStart) {
+                    const phase = predictCyclePhase(prefs.lastPeriodStart, prefs.cycleLength);
+                    if (phase) {
+                        // Return a modified object (toObject() converts mongoose doc to plain JS)
+                        const entryObj = entry.toObject();
+                        // Ensure context exists
+                        if (!entryObj.context) entryObj.context = {};
+                        entryObj.context = { ...entryObj.context, cyclePhase: phase };
+                        return entryObj as IEntry;
+                    }
+                }
+            } catch (e) {
+                console.error("Error backfilling cycle phase:", e);
+            }
+        }
+    }
+
+    return entry;
 }
 
 export async function getAllEntries(userId: string): Promise<IEntry[]> {

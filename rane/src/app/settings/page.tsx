@@ -1,19 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@auth0/nextjs-auth0";
 import Navigation from "@/components/Navigation";
+import { predictCyclePhase, getDayOfCycle } from "@/lib/cycleUtils";
 
 export default function SettingsPage() {
   const { user, isLoading } = useUser();
-  const [healthData, setHealthData] = useState(true);
-  const [cycleTracking, setCycleTracking] = useState(true);
+  const [healthData, setHealthData] = useState(false);
+  const [cycleTracking, setCycleTracking] = useState(false);
+  const [lastPeriodStart, setLastPeriodStart] = useState("");
+  const [cycleLength, setCycleLength] = useState(28);
   const [showSaved, setShowSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  const handleSave = () => {
-    setShowSaved(true);
-    setTimeout(() => setShowSaved(false), 2000);
+  // Load preferences on mount
+  useEffect(() => {
+    async function loadPrefs() {
+      try {
+        const res = await fetch("/api/preferences");
+        if (!res.ok) return;
+        const data = await res.json();
+        setHealthData(data.healthDataEnabled ?? false);
+        setCycleTracking(data.cycleTrackingEnabled ?? false);
+        setCycleLength(data.cycleLength ?? 28);
+        if (data.lastPeriodStart) {
+          setLastPeriodStart(
+            new Date(data.lastPeriodStart).toISOString().split("T")[0]
+          );
+        }
+      } catch {
+        // Preferences not available, keep defaults
+      } finally {
+        setLoaded(true);
+      }
+    }
+    loadPrefs();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          healthDataEnabled: healthData,
+          cycleTrackingEnabled: cycleTracking,
+          lastPeriodStart: lastPeriodStart || null,
+          cycleLength,
+        }),
+      });
+      if (res.ok) {
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 2000);
+      }
+    } catch {
+      // Save failed silently
+    } finally {
+      setSaving(false);
+    }
   };
+
+  // Compute predicted phase for display
+  const predictedPhase =
+    cycleTracking && lastPeriodStart
+      ? predictCyclePhase(new Date(lastPeriodStart), cycleLength)
+      : null;
+
+  const dayOfCycle =
+    cycleTracking && lastPeriodStart
+      ? getDayOfCycle(new Date(lastPeriodStart), cycleLength)
+      : null;
 
   const displayName = user?.name || user?.nickname || "User";
   const displayEmail = user?.email || "";
@@ -115,6 +174,66 @@ export default function SettingsPage() {
                 />
               </button>
             </div>
+
+            {/* Cycle Tracking Inputs */}
+            {cycleTracking && (
+              <div className="mt-2 space-y-4 rounded-xl bg-background/60 p-4">
+                <div>
+                  <label
+                    htmlFor="lastPeriodStart"
+                    className="mb-1.5 block text-xs font-medium text-muted"
+                  >
+                    When did your last period start?
+                  </label>
+                  <input
+                    type="date"
+                    id="lastPeriodStart"
+                    value={lastPeriodStart}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setLastPeriodStart(e.target.value)}
+                    className="w-full rounded-lg border border-card-border bg-card px-3 py-2 text-sm text-foreground focus:border-indigo focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="cycleLength"
+                    className="mb-1.5 block text-xs font-medium text-muted"
+                  >
+                    Average cycle length (days)
+                  </label>
+                  <input
+                    type="number"
+                    id="cycleLength"
+                    value={cycleLength}
+                    min={21}
+                    max={40}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val)) setCycleLength(Math.max(21, Math.min(40, val)));
+                    }}
+                    className="w-full rounded-lg border border-card-border bg-card px-3 py-2 text-sm text-foreground focus:border-indigo focus:outline-none"
+                  />
+                  <p className="mt-1 text-xs text-muted/70">
+                    Typical range: 21–40 days
+                  </p>
+                </div>
+
+                {/* Predicted Phase Display */}
+                {predictedPhase && dayOfCycle && (
+                  <div className="rounded-lg border border-indigo/20 bg-indigo/5 px-4 py-3">
+                    <p className="text-xs font-medium text-indigo">
+                      Current predicted phase
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">
+                      {predictedPhase}
+                      <span className="ml-2 text-xs font-normal text-muted">
+                        Day {dayOfCycle} of {cycleLength}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -167,9 +286,10 @@ export default function SettingsPage() {
         <div className="space-y-3">
           <button
             onClick={handleSave}
-            className="w-full rounded-xl bg-indigo py-3 text-sm font-medium text-white transition-all hover:bg-indigo/90"
+            disabled={saving}
+            className="w-full rounded-xl bg-indigo py-3 text-sm font-medium text-white transition-all hover:bg-indigo/90 disabled:opacity-50"
           >
-            {showSaved ? "Saved!" : "Save Changes"}
+            {showSaved ? "Saved!" : saving ? "Saving..." : "Save Changes"}
           </button>
           <a
             href="/api/auth/logout"
